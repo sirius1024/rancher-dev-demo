@@ -10,7 +10,7 @@
 
 相信我，一切事情的发生都是赶鸭子上架，没有例外。人类所有伟大的变革都是迫不得已，可又是那么顺其自然。比如容器（docker）技术的诞生，比如箭在弦上的创业，比如野心勃勃的kubernetes，比如如今已作为我们左膀右臂的rancher，比如这篇文章。
 
-不同于郑兄的CI/CD实践（[如何利用Docker构建基于DevOps的全自动CI][Zheng]），我们结合自身状况，构建了一套我们自己的DevOps CI/CD流程，更轻更小，更适合Startup。
+不同于郑兄的CI/CD实践（[如何利用Docker构建基于DevOps的全自动CI][Zheng]），我们结合自身状况，构建了一套我们自己的DevOps CI/CD流程，更轻更小，更适合Startup。
 
 
 ## 一、Node.js适合我们，Docker适合我们
