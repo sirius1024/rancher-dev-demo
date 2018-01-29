@@ -13,7 +13,7 @@
 不同于郑兄的CI/CD实践（[如何利用Docker构建基于DevOps的全自动CI][Zheng]），我们结合自身状况，构建了一套我们自己的DevOps CI/CD流程，更轻更小，更适合Startup。
 
 
-## 一、Node.js适合我们，Docker适合我们
+## 一、合适的才是最好的（Node.js & Docker）
 
 如果世界只有FLAG、BAT，那就太无趣了。iHealth是一家初创型公司，我所在的部门有大概10名研发人员，在担负着三端研发工作的同时，所有围绕我们服务的交付和运维工作也都是我们来做。
 
@@ -24,7 +24,7 @@
 运维环境的选型上，我们所有的业务都运行在云端，省去了机房维护和服务器运维的成本。其实在盘古开荒时，我们也是编写了Node程序后，使用PM2部署在服务器上，并没有使用Docker。当然也存在没有使用Docker所带来的一切问题：三端不同步、环境无法隔离……而Docker带给我最大的惊喜除了超强的可移植性，更在于研发人员可以非常容易对程序的顶级架构进行推理。事实上，我们直接使用docker-compose做容器编排着实有一段时间，在一次大规模的服务器迁移中，我们发现需要重新思考越来越多的container管理和更完善的编排方案。Rancher（Cattle）就是在这时被应用到我们的技术栈中。
 
 
-## 二、CI/CD，一切从Github开始
+## 二、一切从Github开始
 
 在运维环境选型一波三折的同时，我们持续集成（CI）与持续交付（CD）的流程也在迭代。从最初的代码拷贝，到结合docker-compose与rsync命令，到使用CI/CD工具……迄今为止，我们摸索出一套相对好用并且好玩的流程。主观上讲，当一只代码猴提交代码之后，他需要去接一杯咖啡。在猫屎氤氲的雾气里45°角仰望天花板，手机微信提醒这次构建成功（或失败，并附带污言秽语）。这时他可以开始往工位走，坐下时，微信又会提醒本次部署到Rancher成功（或失败）。
 
@@ -150,7 +150,7 @@ pipeline:
 
 代码地址：https://github.com/lizheming/drone-wechat/blob/master/index.js
 
-在此之前很久，我的好友Clément 克雷蒙同学写了一个企业微信插件，至今仍在使用。欢迎检查源代码，提issue，star/fork统统欢迎：[clem109/drone-wechat][ToolsWorkWechat]
+在此Drone Plugins里的企业微信插件出现很久之前，我的好友Clément 克雷蒙同学写了一个企业微信插件，至今仍在使用。欢迎检查源代码，提issue，star/fork统统欢迎：[clem109/drone-wechat][ToolsWorkWechat]
 
 
 而在构建完成后，可以看到Drone控制面板里小伙伴们战斗过的痕迹：
@@ -209,6 +209,12 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 因为域名解析的默认端口是80和443，后面发生的事情就和Nginx的作用一毛一样了。域名解析到Traefik服务器的80端口（https则是443），Traefik发现这个域名已经在我这里做了注册，于是代理到10.xx开头的虚拟IP，与Nginx Conf如出一辙：
 
 ![ImageTraefikDomain](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/domain-proxy.png)
+
+
+至此，我们已经完全实现从代码提交，到自动部署以及域名解析的自动化。在生产环境的Traefik on Rancher中开启Https，可以把ssl的整个信任链以文本的形式粘贴进去，同时修改Traefik的Https选项为true即可：
+
+![ImageTraefikProd](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png)
+
 
 ## 七、小技巧
 
@@ -283,6 +289,7 @@ Logspout: [gliderlabs/logspout][ToolsLogspout]
 [rawmind0/alpine-traefik]:https://github.com/rawmind0/alpine-traefik
 [ImageTraefikAdmin]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-admin.png
 [ImageTraefikDomain]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/domain-proxy.png
+[ImageTraefikProd]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png
 
 [ToolsRancher]:https://github.com/rancher/rancher
 [ToolsDrone]:https://github.com/drone/drone
