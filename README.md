@@ -49,7 +49,6 @@ pipeline:
       - npm run test
       - npm run build
 ```
-这是我们项目中摘选的一段.drone.yaml文件，意思是
 
 
 Drone的安装方式如同Rancher一样简单，一行docker命令即可。当然，大家也可以看[Drone的官方文档][DroneDoc]，在这里，只讲一下使用Rancher Catlog安装Drone的方式：
