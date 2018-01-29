@@ -248,12 +248,19 @@ docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docke
 真正的天才，必须能够让事情变得简单。
 
 Rancher: [rancher/rancher][ToolsRancher]
+
 Drone: [drone/drone][ToolsDrone]
+
 Drone企业微信API插件: [clem109/drone-wechat][ToolsWorkWechat]
+
 Harbor: [vmware/harbor][ToolsHarbor]
+
 Traefik: [containous/traefik][ToolsTraefik]
+
 Phabricator: [phacility/phabricator][ToolsPhabricator]
+
 SonarQube: [SonarSource/sonarqube][ToolsSonar]
+
 Logspout: [gliderlabs/logspout][ToolsLogspout]
 
 [DroneGithub]:https://github.com/drone/drone
