@@ -169,9 +169,9 @@ pipeline:
 
 ## 五、ELK与Rancher的集成
 
-ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分布式日志方案。ELK的使用更多在于其本身的优化以及Kibana面向业务时的使用，这本身是一个很大的话题，只ElasticSearch就有许多奇技淫巧。
+ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分布式日志方案。ELK的使用更多在于其本身的优化以及Kibana面向业务时的使用，这本身是一个很大的话题，只ElasticSearch就有许多奇技淫巧。因为人力资源的原因，我们使用了兄弟部门搭建的ELK，等同于使用已有的ELK服务。所以在此也不再赘述ELK的搭建，网上有许多资源可供参考。
 
-因为人力资源的原因，我们使用了兄弟部门搭建的ELK，所以在这里要做的事情就是把rancher中的日志归集到ELK中。
+在这里要做的事情，就是把rancher中的日志归集到已有的ELK中。
 
 在rancher的catlog中找到logspout，这是一个logstash的adapter，为docker而生：
 
@@ -186,7 +186,7 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 
 目前看来一切都很好，对吗？的确是这样。我们提交了代码，drone自动构建镜像到harbor，自动部署到rancher，自动发送构建结果，rancher又可以帮助自动重启死掉的container，使用rancher webhook也可以实现自动弹性计算，并且可以使用yaml文件定制构建流程，定制一些report信息，当构建或部署失败时，让企业微信自动侮辱我们的小伙伴……
 
-可是据说微服务还讲究服务注册和服务发现，如果并不想动用Zookeeper这样的核武器，那就需要找到一个轻量级，能满足需求的替代品。况且目前并没有遇到需要削峰的处理。
+可是据说微服务还讲究服务注册和服务发现，如果并不想动用Zookeeper这样的核武器（就像我们不想用Kong一样，一是有一定学习和维护成本，二是Logo越改越丑），那就需要找到一个轻量级，能满足需求的替代品。况且目前并没有遇到需要削峰的处理。
 
 对于域名的解析，我们选择使用[Traefik][Traefik]作为LB，这个同样使用Golang编写，同样拥有将近13,000 Stars，并且兼具简单的服务注册和服务发现功能。更值得一提的是，Rancher Catlog里的Traefik非常友好的集成了Let's Encrypt（ACME）的功能，可以做到自动申请SSL证书，过期自动续期。当然，不推荐在生产环境使用，SSL免费证书的数量非常容易达到阈值而使得域名无法访问。
 
