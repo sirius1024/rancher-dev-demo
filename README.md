@@ -213,16 +213,16 @@ Traefik内部架构图(Image from traefik.io)：
 - traefik.port=8000 表示这个container对外暴露的端口
 - traefik.alias=drone 表示想将drone server这个container解析为drone.company.com
 
-需要注意的是，traefik.alias有可能重复，同时traefik有自己的一套默认解析规范。更详细的文档请看GitHub 地址：[rawmind0/alpine-traefik][rawmind0/alpine-traefik]
+需要注意的是，traefik.alias有可能导致重复解析，同时traefik有自己的一套默认解析规范。更详细的文档请看GitHub 地址：[rawmind0/alpine-traefik][rawmind0/alpine-traefik]
 
-此时可以看到Traefik的控制面板中，已经注册了服务地址：
+在设置rancher labels后，可以看到Traefik的控制面板中，已经注册了服务地址：
 
 ![ImageTraefikAdmin](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-admin.png)
 
 利用Traefik的这个特性和Rancher对于Container的弹性计算，可以做到简单的服务注册和服务发现。
 
 最后需要在域名服务商那里做A记录解析，解析的IP地址应为Traefik的公网地址。
-因为域名解析的默认端口是80和443，后面发生的事情就和Nginx的作用一毛一样了。域名解析到Traefik服务器的80端口（https则是443），Traefik发现这个域名已经在我这里做了注册，于是代理到10.xx开头的虚拟IP，与Nginx Conf如出一辙：
+因为域名解析的默认端口是80和443，后面发生的事情就和Nginx的作用一毛一样了。域名解析到Traefik服务器的80端口（https则是443），Traefik发现这个域名已经注册到服务中，于是代理到10.xx开头的虚拟IP，转发请求并发送response。与Nginx Conf如出一辙：
 
 ![ImageTraefikDomain](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/domain-proxy.png)
 
@@ -231,7 +231,7 @@ Traefik内部架构图(Image from traefik.io)：
 
 ![ImageTraefikProd](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png)
 
-另外，Traefik并不是LB/Proxy的唯一选择，甚至不是最酷的选择，但确是目前与Rancher集成最好的。下面图中的程序都值得做调研（可以小小的注意一下istio，天庭饱满，骨骼轻奇，这还只是去年7月底的数据……）：
+另外，Traefik并不是LB/Proxy的唯一选择，甚至不是最酷的选择，但确是目前与Rancher集成最好的。下面图中的程序都值得做调研（可以小小的注意一下istio，天庭饱满，骨骼轻奇，这还只是2017年7月底的数据……）：
 
 ![ImageProxyStars](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/Proxy%20Stars.jpeg)
 
