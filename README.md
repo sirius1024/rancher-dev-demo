@@ -229,7 +229,7 @@ Traefik内部架构图(Image from traefik.io)：
 
 ![ImageTraefikProd](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png)
 
-另外，Traefik并不是LB/Proxy的唯一选择，甚至不是最酷的选择，但确是目前与Rancher集成最好的。下面图中的程序都值得做调研：
+另外，Traefik并不是LB/Proxy的唯一选择，甚至不是最酷的选择，但确是目前与Rancher集成最好的。下面图中的程序都值得做调研（可以小小的注意一下istio，天庭饱满，骨骼轻奇，这还只是去年7月底的数据……）：
 
 ![ImageProxyStars](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/Proxy%20Stars.jpeg)
 
