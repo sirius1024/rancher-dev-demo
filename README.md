@@ -151,6 +151,7 @@ pipeline:
 ![ImageDroneBuilded](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/workwechat-report.png)
 
 企业微信与微信客户端是连通的，可玩性还不错：
+
 ![ImageWechatNotify](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-notify.jpeg)
 
 在这里我认为有必要提醒一下，使用Drone的企业微信插件时，不要使用Drone Plugins列表里的企业微信。我翻阅过那个插件的源码，其中又一段会将企业的敏感信息发送至私人服务器。不管作者本身是出于BaaS的好意，还是其它想法，我认为都是不妥的：

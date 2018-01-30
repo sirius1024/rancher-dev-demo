@@ -1,0 +1,60 @@
+pipeline:
+  build_step:
+    image: plugins/docker
+    # 修改成你的镜像仓库、用户名和密码
+    username: harbor_username
+    password: harbor_password
+    registry: harbor.company.com
+    repo: harbor.company.com/sirius1024/rancher-dev-demo
+    mirror: 'https://registry.docker-cn.com'
+    # 每次构建都将最新的image设置为latest，并根据Build Number增加一个镜像以记录version
+    tag:
+      - latest
+      - ${DRONE_BUILD_NUMBER}
+    dockerfile: Dockerfile
+    when:
+      branch: master
+      event: push
+  report-build:
+    image: clem109/drone-wechat
+    corpid: 企业微信corpid
+    corp-secret: 企业微信srcret
+    agentid: 企业微信自建应用的agentid
+    title: '${DRONE_REPO_NAME}'
+    description: >
+      构建序列: 由${DRONE_COMMIT_AUTHOR}提交代码触发构建 -
+      ${DRONE_BUILD_NUMBER}成功，点击卡片查询详细信息。
+    msg_url: '${DRONE_BUILD_LINK}'
+    btn_txt: 查看详情
+    when:
+      status:
+        - success
+  rancher:
+    image: peloton/drone-rancher
+    url: 'http://rancher.company.com/v2-beta/projects/1a870'
+    access_key: Rancher Environment API Keys - access key
+    secret_key: Rancher Environment API Keys - secret key
+    service: stack_name/service_name
+    docker_image: 'harbor.company.com/sirius1024/rancher-dev-demo'
+    batch_size: 1
+    timeout: 600
+    # 自动确认升级完成，无需点击Upgrade Finished
+    confirm: true
+    when:
+      branch: master
+      event: push
+  report-deploy:
+    image: clem109/drone-wechat
+    corpid: 企业微信corpid
+    corp-secret: 企业微信srcret
+    agentid: 企业微信自建应用的agentid
+    title: '${DRONE_REPO_NAME}'
+    description: |
+      构建序列: ${DRONE_REPO_NAME} 第 ${DRONE_BUILD_NUMBER} 次提交代码构建部署成功。
+      更新内容: ${DRONE_COMMIT_MESSAGE}
+    msg_url: '自定义跳转链接'
+    btn_txt: 查看运行状况
+    when:
+      branch: master
+      status:
+        - success
