@@ -19,16 +19,22 @@
 
 技术的选型上，服务端、Web端和移动端（Android、iOS）都要上，但人少。所以招人的时候并没有以貌取人的资格，部门对外的Title都是全栈。能一门语言通吃三端，群众基础广泛，恐怕没有比Javascript/Typescript(Node.js)更合适的了。
 
-服务端有Express、Koa、Feather、Nest、Meteor等各有其长的框架，前端大而火的Reactjs、Vuejs和Angular。因为公司的健康设备（血糖仪、血压计、体温计、血氧、体脂秤等等）会有专门的部门研发设计以及提供SDK，所以服务端的研发工作更多是在设计实现和性能优化上，React Native是一枚大杀器。
+服务端有Express、Koa、Feather、Nest、Meteor等各有其长的框架，前端大而火的Reactjs、Vuejs和Angular，不管是Server Render还是前后端分离，都可以得心应手。因为公司的健康设备（血糖仪、血压计、体温计、血氧、体脂秤等等）会有专门的部门研发设计以及提供SDK，所以服务端的研发工作更多是在设计实现和性能优化上，React Native是一枚大杀器。虽然现在公司并没有桌面端的需求，但不能否认的是Electron是一个很有趣的项目，也为“全栈”这个词增加了更多背书。
+
+![ImageJsStack](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/js-fullstack.png)
 
 运维环境的选型上，所有的业务都运行在云端，省去了机房维护和服务器运维的成本。其实在盘古开荒时，我们也是编写了Node程序后，使用PM2部署在服务器上，并没有使用Docker。当然也存在没有使用Docker所带来的一切问题：三端不同步、环境无法隔离……而Docker带给我最大的惊喜除了超强的可移植性，更在于研发人员可以非常容易对程序的顶级架构进行推理。事实上，我们直接使用docker-compose做容器编排着实有一段时间，在一次大规模的服务器迁移中，发现需要重新思考越来越多的container管理和更完善的编排方案。Rancher（Cattle）就是在这时被应用到技术栈中。
 
 
 ## 二、一切从Github开始
 
-在运维环境选型一波三折的同时，持续集成（CI）与持续交付（CD）的流程也在迭代。从最初的代码拷贝，到结合docker-compose与rsync命令，到使用CI/CD工具……迄今为止，我们摸索出一套相对好用并且好玩的流程。主观上讲，当一只代码猴提交代码之后，他需要去接一杯咖啡。在猫屎氤氲的雾气里45°角仰望天花板，手机微信提醒这次构建成功（或失败，并附带污言秽语）。这时他可以开始往工位走，坐下时，微信又会提醒本次部署到Rancher成功（或失败）。
+在运维环境一波三折的同时，DevOps的征程也是亦步亦趋，步步惊心。幸运的是，我们知道自己缺乏什么，想要什么，所以能比较容易的做到“哪里不会点哪里”。如同上一章节所述，合适的才是最好的。持续集成（CI）与持续交付（CD）的迭代过程，从最初的代码拷贝，到结合docker-compose与rsync命令，到使用CI/CD工具，做到相对意义上的自动化……迄今为止，我们摸索出一套相对好用并且好玩的流程。
 
-故事开始的地方是github。当开发者写完 ~~BUG~~ 功能之后，需要有地方保存这些宝贵的资料。之所以没有使用Gitlab或Bitbucket搭建私有的Git服务器，是因为我们认为代码是最直接的价值体现。服务如骨架，终端如皮肤，UE如衣服，三者组成让人赏心悦目的风景，代码是这背后的基础。我们认为在团队精力无法更分散、人口规模尚小时，购买Github的商业版是稳妥且必要的，毕竟那帮人修复一次故障就像把网线拔下来再插上那样简单。
+![ImageDevOps](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/devops-srctions.png)
+
+故事大致是这样的，当一只代码猴提交代码之后，他需要去接一杯咖啡。在猫屎氤氲的雾气里45°角仰望天花板，手机微信提醒这次构建成功（或失败，并附带污言秽语）。这时他可以开始往工位走，坐下时，微信又会提醒本次部署到Rancher成功（或失败）。
+
+这一切开始的地方是github。当开发者写完 ~~BUG~~ 功能之后，需要有地方保存这些宝贵的资料。之所以没有使用Gitlab或Bitbucket搭建私有的Git服务器，是因为我们认为代码是最直接的价值体现。服务如骨架，终端如皮肤，UE如衣服，三者组成让人赏心悦目的风景，代码是这背后的基础。我们认为在团队精力无法更分散、人口规模尚小时，购买Github的商业版是稳妥且必要的，毕竟那帮人修复一次故障就像把网线拔下来再插上那样简单。
 
 
 ## 三、Drone CI
@@ -37,17 +43,16 @@ Drone这个单词在翻译中译作雄蜂、无人机。我特意咨询了一位
 
 ```yaml
 pipeline:
-  backend:
-    image: golang
-    commands:
-      - go build
-      - go test
-  frontend:
-    image: node
+  build:
+    image: node:latest
     commands:
       - npm install
+      - npm run lint
       - npm run test
-      - npm run build
+  publish:
+    image: plugins/npm
+    when:
+      branch: master
 ```
 
 
@@ -72,11 +77,13 @@ Drone的安装方式如同Rancher一样简单，一行docker命令即可。当�
 
 ## 四、Drone与rancher、harbor、企业微信的集成
 
-截止到上面的步骤，我们打开了Drone对于Github Repo的监听，再次提醒，需要在代码repo的根目录包含.drone.yml文件，才会真正触发Drone的pipeline。
+在决定使用Drone之前，需要知道的是，Drone是一个高度依赖社区的项目。其文档诸多不完善（完善过，版本迭代，文档跟不上了），plugins质量良莠。但对于擅长Github issue、Google、Stackoverflow的朋友来说，这并不是特别困难的事情。Drone也有付费版本，无需自己提供服务器，而是像Github那样作为服务使用。
+
+如果你决定开始使用Drone，截止到上面的步骤，我们打开了Drone对于Github Repo的监听，再次提醒，需要在代码repo的根目录包含.drone.yml文件，才会真正触发Drone的pipeline。
 
 那么，如果想重现上面故事中的场景，应该如何进行集成呢？
 
-我司在构建CI/CD的过程中，现使用Harbor作为私有镜像仓库，从程序猿提交代码到自动部署到Rancher，其实应当经历如下步骤：
+我司在构建CI/CD的过程中，现使用Harbor作为私有镜像仓库，从提交代码到自动部署到Rancher，其实应当经历如下步骤：
 
 - 提交代码，触发Github Webhook
 - Drone使用docker插件，根据Dockerfile构建镜像，并推送到Harbor中
@@ -143,6 +150,9 @@ pipeline:
 
 ![ImageDroneBuilded](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/workwechat-report.png)
 
+企业微信与微信客户端是连通的，可玩性还不错：
+![ImageWechatNotify](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-notify.jpeg)
+
 在这里我认为有必要提醒一下，使用Drone的企业微信插件时，不要使用Drone Plugins列表里的企业微信。我翻阅过那个插件的源码，其中又一段会将企业的敏感信息发送至私人服务器。不管作者本身是出于BaaS的好意，还是其它想法，我认为都是不妥的：
 
 ![ImageDroneWrokwchatBadCode](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/bad-code.png)
@@ -179,6 +189,10 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 
 对于域名的解析，我们选择使用[Traefik][Traefik]作为LB，这个同样使用Golang编写，同样拥有将近13,000 Stars，并且兼具简单的服务注册和服务发现功能。更值得一提的是，Rancher Catlog里的Traefik非常友好的集成了Let's Encrypt（ACME）的功能，可以做到自动申请SSL证书，过期自动续期。当然，不推荐在生产环境使用，SSL免费证书的数量非常容易达到阈值而使得域名无法访问。
 
+Traefik内部架构图(Image from traefik.io)：
+
+![ImageTraefikInternal](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik-processer.png)
+
 如何安装Traefik呢？我们以Rancher Catlog中的Traefik为例（不使用ACME）：
 
 ![ImageTraefikConfig](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_config.png)
@@ -214,10 +228,15 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 
 ![ImageTraefikProd](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png)
 
+另外，Traefik并不是LB/Proxy的唯一选择，甚至不是最酷的选择，但确是目前与Rancher集成最好的。下面图中的程序都值得做调研：
+
+![ImageProxyStars](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/Proxy%20Stars.jpeg)
+
+> 事实上对于Traefik我们是又爱又恨。它能非常方便的与Rancher集成，功能简便强大，性能可观。但在最开始着实踩了不少坑，一度打算放弃并回归到传统的Nginx做反向代理的方式，甚至写了PR并被merge到master中。截止目前Rancher Catlog中最新的1.5版本，已经是一个真正稳定可用的版本了。
 
 ## 七、小技巧
 
-Node.js的项目中书写Dockerfile时，经常会用到yarn或者npm i来拉取依赖包。但npm的服务器远在世界的另一端，这时可以使用淘宝的镜像进行加速：
+Node.js的项目中书写Dockerfile时，经常会用到yarn或者npm i来拉取依赖包。但npm的服务器远在世界的另一端，这时可以使用淘宝的镜像进行加速。通常我们在本地开发时执行会记得加上npm镜像，在服务器上跑Dockerfile也是一样的道理：
 ```bash
 FROM node:alpine
 WORKDIR /app
@@ -246,9 +265,9 @@ docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docke
 
 ## 八、总结，以及工具链汇总
 
-罗马不是一天建成，万丈高楼平地起。在企业发展之初，我们在打基础的同时，也要保证项目的高速迭代。我们可以允许服务死掉，但是要保证无感知的情况下，服务能迅速的活过来。
+罗马不是一天建成，万丈高楼平地起。在企业发展之初，我们在打基础的同时，也要保证项目高速迭代。我们可以允许服务死掉，但是要保证无感知的情况下，服务能迅速的活过来。
 
-在持续交付的过程中，我们也尝试加入sonar代码质量管理，使用phabricator作为code review环节。但因目前尚未达到一个非常成熟的阶段，所以本次不再分享，仅作为印子来启发各位聪明的小伙伴，在DevOps的路上不但变得专业，也能变得有趣。
+在持续交付的过程中，我们也尝试使用sonar代码质量管理，使用phabricator作为code review环节。但因目前尚未达到一个非常成熟的阶段，所以本次不再分享，仅作为引子来启发各位聪明的小伙伴，在DevOps的路上不但变得专业，也能变得有趣。
 
 真正的天才，必须能够让事情变得简单。
 
@@ -268,9 +287,16 @@ SonarQube: [SonarSource/sonarqube][ToolsSonar]
 
 Logspout: [gliderlabs/logspout][ToolsLogspout]
 
+配置中心(携程做的，代码写的还不错): [ctripcorp/apollo][ToolsConfigCenter]
+
+SuperSet(BI): [apache/incubator-superset][ToolsBI]
+
 [DroneGithub]:https://github.com/drone/drone
 [DroneDoc]:http://docs.drone.io
 [Zheng]:https://mp.weixin.qq.com/s/vhpmqJVJpnqQkSdp2oGhOg
+
+[ImageJsStack]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/js-fullstack.png
+[ImageDevOps]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/devops-srctions.png
 
 [ImageDroneInstall]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-install.png
 [ImageDroneInstalled]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone_installed.png
@@ -278,6 +304,7 @@ Logspout: [gliderlabs/logspout][ToolsLogspout]
 [ImageDroneBuilded]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/workwechat-report.png
 [ImageDroneWrokwchatBadCode]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/bad-code.png
 [ImageDroneRecords]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-records.png
+[ImageWechatNotify]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-notify.jpeg
 
 [ImageLogRun]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/logspout_logs.png
 [ImageLogConf]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/logspout_config.png
@@ -289,6 +316,8 @@ Logspout: [gliderlabs/logspout][ToolsLogspout]
 [ImageTraefikAdmin]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-admin.png
 [ImageTraefikDomain]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/domain-proxy.png
 [ImageTraefikProd]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_prod.png
+[ImageTraefikInternal]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik-processer.png
+[ImageProxyStars]:https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/Proxy%20Stars.jpeg
 
 [ToolsRancher]:https://github.com/rancher/rancher
 [ToolsDrone]:https://github.com/drone/drone
@@ -298,3 +327,5 @@ Logspout: [gliderlabs/logspout][ToolsLogspout]
 [ToolsPhabricator]:https://github.com/phacility/phabricator
 [ToolsSonar]:https://github.com/SonarSource/sonarqube
 [ToolsLogspout]:https://github.com/gliderlabs/logspout
+[ToolsConfigCenter]:https://github.com/ctripcorp/apollo
+[ToolsBI]:https://github.com/apache/incubator-superset
