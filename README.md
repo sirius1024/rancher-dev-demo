@@ -60,11 +60,11 @@ pipeline:
 ```
 
 
-Drone的安装方式如同Rancher一样简单，一行docker命令即可。当然，大家也可以看[Drone的官方文档][DroneDoc]，在这里，只讲一下使用Rancher Catlog安装Drone的方式：
+Drone的安装方式如同Rancher一样简单，一行docker命令即可。当然，大家也可以看[Drone的官方文档][DroneDoc]，在这里，只讲一下使用Rancher catalog安装Drone的方式：
 
 ![ImageDroneInstall](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/drone-install.png)
 
-查看大图大家可以看到Drone使用Rancher Catlog安装的方法（with github），在Github 的Settings中创建Drone的OAuth App时，Home Page Url务必要写你能访问Drone的IP地址或域名，例如：
+查看大图大家可以看到Drone使用Rancher catalog安装的方法（with github），在Github 的Settings中创建Drone的OAuth App时，Home Page Url务必要写你能访问Drone的IP地址或域名，例如：
 > http://drone.company.com
 
 而OAuth App的Authorization callback URL应该对应上面的写法：
@@ -179,7 +179,7 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 
 在这里要做的事情，就是把rancher中的日志归集到已有的ELK中。
 
-在rancher的catlog中找到logspout，这是一个logstash的adapter，为docker而生：
+在rancher的catalog中找到logspout，这是一个logstash的adapter，为docker而生：
 
 ![ImageLogRun](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/logspout_logs.png)
 
@@ -194,13 +194,13 @@ ELK是ElasticSearch、Logstash与Kibana的集合，是一套非常强大的分�
 
 可是据说微服务还讲究服务注册和服务发现，如果并不想动用Zookeeper这样的核武器（就像我们不想用Kong一样，一是有一定学习和维护成本，二是Logo越改越丑），那就需要找到一个轻量级，能满足需求的替代品。况且目前并没有遇到需要削峰的处理。
 
-对于域名的解析，我们选择使用[Traefik][Traefik]作为LB，这个同样使用Golang编写，同样拥有将近13,000 Stars，并且兼具简单的服务注册和服务发现功能。更值得一提的是，Rancher Catlog里的Traefik非常友好的集成了Let's Encrypt（ACME）的功能，可以做到自动申请SSL证书，过期自动续期。当然，不推荐在生产环境使用，SSL免费证书的数量非常容易达到阈值而使得域名无法访问。
+对于域名的解析，我们选择使用[Traefik][Traefik]作为LB，这个同样使用Golang编写，同样拥有将近13,000 Stars，并且兼具简单的服务注册和服务发现功能。更值得一提的是，Rancher catalog里的Traefik非常友好的集成了Let's Encrypt（ACME）的功能，可以做到自动申请SSL证书，过期自动续期。当然，不推荐在生产环境使用，SSL免费证书的数量非常容易达到阈值而使得域名无法访问。
 
 Traefik内部架构图(Image from traefik.io)：
 
 ![ImageTraefikInternal](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik-processer.png)
 
-如何安装Traefik呢？我们以Rancher Catlog中的Traefik为例（不使用ACME）：
+如何安装Traefik呢？我们以Rancher catalog中的Traefik为例（不使用ACME）：
 
 ![ImageTraefikConfig](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_config.png)
 
@@ -239,7 +239,7 @@ Traefik内部架构图(Image from traefik.io)：
 
 ![ImageProxyStars](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/Proxy%20Stars.jpeg)
 
-> 事实上对于Traefik我们是又爱又恨。它能非常方便的与Rancher集成，功能简便强大，性能可观。但在最开始着实踩了不少坑，一度打算放弃并回归到传统的Nginx做反向代理的方式，甚至写了PR并被merge到master中。截止目前Rancher Catlog中最新的1.5版本，已经是一个真正稳定可用的版本了。
+> 事实上对于Traefik我们是又爱又恨。它能非常方便的与Rancher集成，功能简便强大，性能可观。但在最开始着实踩了不少坑，一度打算放弃并回归到传统的Nginx做反向代理的方式，甚至写了PR并被merge到master中。截止目前Rancher catalog中最新的1.5版本，已经是一个真正稳定可用的版本了。
 
 ## 七、小技巧
 
