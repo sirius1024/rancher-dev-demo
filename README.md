@@ -204,7 +204,7 @@ Traefik内部架构图(Image from traefik.io)：
 
 ![ImageTraefikConfig](https://raw.githubusercontent.com/sirius1024/rancher-dev-demo/master/public/images/traefik_config.png)
 
-我们的目的是做域名解析，integration mode应该设置为metadata。Http Port设置为80，Https Port设置为443，Admin Port可以根据自己实际情况填写，默认8000。
+我们的目的是做域名解析，integration mode应该设置为**external**。Http Port设置为80，Https Port设置为443，Admin Port可以根据自己实际情况填写，默认8000。
 
 此时的Traefik已经准备就绪，但是打开traefik_host:8000查看控制面板时，发现Traefik并没有做任何代理。原因是需要在代理的目标中，使用rancher labels标示出traefik的代理方式。
 
